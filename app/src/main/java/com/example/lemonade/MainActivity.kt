@@ -17,18 +17,25 @@ class MainActivity : AppCompatActivity() {
     private val LEMONADE_STATE = "LEMONADE_STATE"
     private val LEMON_SIZE = "LEMON_SIZE"
     private val SQUEEZE_COUNT = "SQUEEZE_COUNT"
+
     // SELECT represents the "pick lemon" state
     private val SELECT = "select"
+
     // SQUEEZE represents the "squeeze lemon" state
     private val SQUEEZE = "squeeze"
+
     // DRINK represents the "drink lemonade" state
     private val DRINK = "drink"
+
     // RESTART represents the state where the lemonade has been drunk and the glass is empty
     private val RESTART = "restart"
+
     // Default the state to select
     private var lemonadeState = "select"
+
     // Default lemonSize to -1
     private var lemonSize = -1
+
     // Default the squeezeCount to -1
     private var squeezeCount = -1
 
@@ -52,10 +59,11 @@ class MainActivity : AppCompatActivity() {
         setViewElements()
         lemonImage!!.setOnClickListener {
             // TODO: call the method that handles the state when the image is clicked
+            clickLemonImage()
         }
         lemonImage!!.setOnLongClickListener {
             // TODO: replace 'false' with a call to the function that shows the squeeze count
-            false
+            showSnackbar()
         }
     }
 
@@ -76,6 +84,7 @@ class MainActivity : AppCompatActivity() {
      * This method determines the state and proceeds with the correct action.
      */
     private fun clickLemonImage() {
+
         // TODO: use a conditional statement like 'if' or 'when' to track the lemonadeState
         //  when the image is clicked we may need to change state to the next step in the
         //  lemonade making progression (or at least make some changes to the current state in the
@@ -96,13 +105,34 @@ class MainActivity : AppCompatActivity() {
 
         // TODO: lastly, before the function terminates we need to set the view elements so that the
         //  UI can reflect the correct state
+        if (lemonadeState == SELECT) {
+            lemonadeState = SQUEEZE
+            lemonSize = lemonTree.pick()
+            squeezeCount = 0
+        } else if (lemonadeState == SQUEEZE) {
+            squeezeCount++
+
+            if (squeezeCount == lemonSize) {
+                lemonadeState = DRINK
+            } else lemonadeState = SQUEEZE
+        } else if (lemonadeState == DRINK) {
+            lemonadeState = RESTART
+
+        } else if (lemonadeState == RESTART) {
+            lemonadeState = SELECT
+
+        } else lemonadeState
+
+
+
+        setViewElements()
     }
 
     /**
      * Set up the view elements according to the state.
      */
     private fun setViewElements() {
-        val textAction: TextView = findViewById(R.id.text_action)
+
         // TODO: set up a conditional that tracks the lemonadeState
 
         // TODO: for each state, the textAction TextView should be set to the corresponding string from
@@ -111,6 +141,26 @@ class MainActivity : AppCompatActivity() {
         // TODO: Additionally, for each state, the lemonImage should be set to the corresponding
         //  drawable from the drawable resources. The drawables have the same names as the strings
         //  but remember that they are drawables, not strings.
+
+        val textAction: TextView = findViewById(R.id.text_action)
+        val lemonimage: ImageView = findViewById(R.id.image_lemon_state)
+
+        if (lemonadeState == SELECT) {
+            textAction.text = getString(R.string.lemon_select)
+            lemonimage.setImageResource(R.drawable.lemon_tree)
+
+        } else if (lemonadeState == SQUEEZE) {
+            textAction.text = getString(R.string.lemon_squeeze)
+            lemonimage.setImageResource(R.drawable.lemon_squeeze)
+
+        } else if (lemonadeState == DRINK) {
+            lemonimage.setImageResource(R.drawable.lemon_drink)
+            textAction.text = getString(R.string.lemon_drink)
+
+        } else  {
+            lemonimage.setImageResource(R.drawable.lemon_restart)
+            textAction.text = getString(R.string.lemon_empty_glass)
+        }
     }
 
     /**
